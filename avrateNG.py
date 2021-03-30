@@ -67,10 +67,12 @@ def play(config, video_index, playlist):
     """
     if config.get("no_video_playback", False):
         return
+
     def q(x):
         """ quote the video name for command line usage,
         prevends problems with spaces in video filenames"""
         return "\"" + x + "\""
+
     video = " ".join(map(q, config[playlist][video_index]))
 
     lInfo("play {}".format(video))
@@ -91,9 +93,10 @@ def welcome(db, config):
     """
     # for every new start ("/"): user_id (cookie) is incremented by 1
     if not db.execute("SELECT * FROM sqlite_master WHERE type='table' AND name='ratings'").fetchone():
-        user_id = 1 # if ratings table does not exist: first user_id = 1
+        user_id = 1  # if ratings table does not exist: first user_id = 1
     else:
-        user_id = int(db.execute('SELECT max(user_ID) from ratings').fetchone()[0]) + 1  # new user_ID is always old (highest) user_ID+1
+        user_id = int(db.execute('SELECT max(user_ID) from ratings').fetchone()[
+                          0]) + 1  # new user_ID is always old (highest) user_ID+1
     response.set_cookie("user_id", str(user_id), path="/")
 
     # initialize session_state variable (throws error when refreshing the page or going back)
@@ -101,19 +104,20 @@ def welcome(db, config):
 
     # generate new shuffled playlist for every participant when shuffle mode is active
     if config["shuffle"]:
-        config["shuffled_playlist"] = random.sample(config["playlist"],len(config["playlist"]))
+        config["shuffled_playlist"] = random.sample(config["playlist"], len(config["playlist"]))
 
     # check if training stage is wished and/or training has already finished:
-    if config["trainingsplaylist"]: # check if training switch is toggled
-        if not request.get_cookie("training_state") == "done": # Cookie that controls if training was already done or is still open
-            response.set_cookie("training_state","open", path="/")
+    if config["trainingsplaylist"]:  # check if training switch is toggled
+        if not request.get_cookie(
+                "training_state") == "done":  # Cookie that controls if training was already done or is still open
+            response.set_cookie("training_state", "open", path="/")
             response.set_cookie("training", "1", path="/")
             return template(config["template_folder"] + "/training_welcome.tpl", title="AvRateNG", user_id=user_id)
         else:
             response.set_cookie("training", "0", path="/")
             return template(config["template_folder"] + "/welcome.tpl", title="AvRateNG", user_id=user_id)
     else:
-        response.set_cookie("training","0", path="/")
+        response.set_cookie("training", "0", path="/")
         return template(config["template_folder"] + "/welcome.tpl", title="AvRateNG", user_id=user_id)
 
 
@@ -150,7 +154,10 @@ def rate(db, config, video_index):
         session_state = session_state + 1
         response.set_cookie("session_state", str(session_state), path="/")
 
-    return template(config["template_folder"] + "/rate1.tpl", title="AvRateNG", rating_template=config["rating_template"], video_index=video_index, video_count=len(config[playlist]), user_id=user_id, question=config.get("question", "add question to config.json"))
+    return template(config["template_folder"] + "/rate1.tpl", title="AvRateNG",
+                    rating_template=config["rating_template"], video_index=video_index,
+                    video_count=len(config[playlist]), user_id=user_id,
+                    question=config.get("question", "add question to config.json"))
 
 
 @route('/about')  # About section
@@ -189,7 +196,7 @@ def statistics(db, config):
     TODO: was planned to show some test statistics, can be either removed or re-checked
     """
     # Get Data and video names for ratings and transform to JSON objects (better handling)
-    db_data=db.execute("SELECT video_name,rating,rating_type from ratings").fetchall()
+    db_data = db.execute("SELECT video_name,rating,rating_type from ratings").fetchall()
     video_names = [row[0] for row in db_data]
     rating_data = [int(row[1]) for row in db_data]
     rating_types = [row[2] for row in db_data]
@@ -199,7 +206,8 @@ def statistics(db, config):
         rating_dict.setdefault(rating_types[idx], {}).setdefault(video, []).append(rating_data[idx])
 
     # return dictionary as JSON as interface to Java script (see statistics.tpl file for further info)
-    return template(config["template_folder"] + "/statistics.tpl", title="AvRateNG", rating_dict=json.dumps(rating_dict))
+    return template(config["template_folder"] + "/statistics.tpl", title="AvRateNG",
+                    rating_dict=json.dumps(rating_dict))
 
 
 def store_rating_key_value_pair(db, config, user_id, timestamp, video_index, key, value, tracker, training=False):
@@ -207,6 +215,7 @@ def store_rating_key_value_pair(db, config, user_id, timestamp, video_index, key
     store a given rating as a key value pair inside the sqlite3 table,
     further also timestamp and played video is stored
     """
+
     def get_video_name(playlist, video_index, config):
         video_name = config[playlist][int(video_index)]
         # for supporting multiple files per playlist entry, here needs to be done some extension
@@ -229,20 +238,25 @@ def store_rating_key_value_pair(db, config, user_id, timestamp, video_index, key
         video_name = get_video_name(playlist, video_index, config)
 
         # Store rating to DB
-        db.execute('CREATE TABLE IF NOT EXISTS ratings (user_ID INTEGER, video_ID TEXT, video_name TEXT, rating_type TEXT, rating TEXT, timestamp TEXT);')
-        db.execute('INSERT INTO ratings VALUES (?,?,?,?,?,?);',(user_id, video_index, video_name, key, value, timestamp))
+        db.execute(
+            'CREATE TABLE IF NOT EXISTS ratings (user_ID INTEGER, video_ID TEXT, video_name TEXT, rating_type TEXT, rating TEXT, timestamp TEXT);')
+        db.execute('INSERT INTO ratings VALUES (?,?,?,?,?,?);',
+                   (user_id, video_index, video_name, key, value, timestamp))
         db.commit()
 
         # Store mouse tracking data to DB
-        db.execute('CREATE TABLE IF NOT EXISTS tracker (user_ID INTEGER, video_ID TEXT, video_name TEXT, tracker TEXT);')
-        db.execute('INSERT INTO tracker VALUES (?,?,?,?);',(user_id, video_index, video_name, tracker))
+        db.execute(
+            'CREATE TABLE IF NOT EXISTS tracker (user_ID INTEGER, video_ID TEXT, video_name TEXT, tracker TEXT);')
+        db.execute('INSERT INTO tracker VALUES (?,?,?,?);', (user_id, video_index, video_name, tracker))
         db.commit()
 
     else:
         playlist = "trainingsplaylist"
         video_name = get_video_name(playlist, video_index, config)
-        db.execute('CREATE TABLE IF NOT EXISTS training (user_ID INTEGER, video_ID TEXT, video_name TEXT, rating_type TEXT, rating TEXT, timestamp TEXT);')
-        db.execute('INSERT INTO training VALUES (?,?,?,?,?,?);',(user_id, video_index, video_name, key, value, timestamp))
+        db.execute(
+            'CREATE TABLE IF NOT EXISTS training (user_ID INTEGER, video_ID TEXT, video_name TEXT, rating_type TEXT, rating TEXT, timestamp TEXT);')
+        db.execute('INSERT INTO training VALUES (?,?,?,?,?,?);',
+                   (user_id, video_index, video_name, key, value, timestamp))
         db.commit()
 
     return playlist
@@ -275,7 +289,8 @@ def saveRating(db, config):
 
     training = int(request.get_cookie("training"))
     for key, value in request_data_pairs.items():
-        playlist = store_rating_key_value_pair(db, config, user_id, timestamp, video_index, key, value, tracker, training)
+        playlist = store_rating_key_value_pair(db, config, user_id, timestamp, video_index, key, value, tracker,
+                                               training)
 
     lInfo("selected playlist: {}".format(playlist))
     # check if this was the last video in playlist
@@ -307,20 +322,20 @@ def saveDemographics(db, config):
     user_id = int(request.get_cookie("user_id"))
 
     db.execute('CREATE TABLE IF NOT EXISTS info (user_ID, info_json TEXT);')
-    db.execute('INSERT INTO info VALUES (?,?);',(user_id, json.dumps(dict(request.forms))))
+    db.execute('INSERT INTO info VALUES (?,?);', (user_id, json.dumps(dict(request.forms))))
     db.commit()
 
     redirect('/rate/0')
 
 
-@route('/static/<filename:path>',name='static')  # access the stylesheets and static files (JS files,...)
+@route('/static/<filename:path>', name='static')  # access the stylesheets and static files (JS files,...)
 @auth_basic(check_credentials)
-def server_static(filename,config):
+def server_static(filename, config):
     """
     needed for routing the static files (CSS)
     """
     this_dir_path = os.path.dirname(os.path.abspath(__file__))
-    return static_file(filename, root=this_dir_path + '/'+ config["template_folder"]  +'/static')
+    return static_file(filename, root=this_dir_path + '/' + config["template_folder"] + '/static')
 
 
 def server(config, host="127.0.0.1"):
@@ -369,7 +384,8 @@ def get_and_check_playlist(playlistfilename):
             videos = normalized_video_path.split(" | ")
             for video in videos:
                 if not os.path.isfile(video):
-                    lError("'{}' is not a valid videofile, please check your playlistfile".format(normalized_video_path))
+                    lError(
+                        "'{}' is not a valid videofile, please check your playlistfile".format(normalized_video_path))
                     sys.exit(-1)
             playlist.append(videos)
         print("\n".join(map(str, playlist)))
@@ -402,12 +418,12 @@ def main(params=[]):
     if config["training"]:
         config["trainingsplaylist"] = get_and_check_playlist(config["trainingsplaylist"])
     else:
-        config["trainingsplaylist"] = "" # empty string when no training is set
-
+        config["trainingsplaylist"] = ""  # empty string when no training is set
 
     if config["voiceRecognition"]:
         # change the rating template to the (radio-) one including voice recognition
-        lInfo("Voice recognition active: Automatically loading radio-button template '{}'".format(config["voiceRecognition_template"]))
+        lInfo("Voice recognition active: Automatically loading radio-button template '{}'".format(
+            config["voiceRecognition_template"]))
         config["rating_template"] = config["voiceRecognition_template"]
 
     if any(system().lower().startswith(i) for i in ["linux", "darwin"]):
