@@ -8,7 +8,7 @@
   "template_folder": "templates",
   "training": true,
   "trainingsplaylist": "training.list",
-  "rating_template": "radio1.tpl",
+  "rating_template": "radio1_speech_recording.tpl",
   "voiceRecognition": false,
   "voiceRecognition_template": "radio_voice-recognition.tpl",
   "shuffle": true,

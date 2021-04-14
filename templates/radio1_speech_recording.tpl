@@ -50,3 +50,34 @@ $(document).ready(function(){
     });
 });
 </script>
+
+<!-- Logic behind speech recording -->
+<script>
+  /* Capture the audio stream from user's microphone */
+  /* TODO Finish implementing the logic allowing to record speech */
+  navigator.mediaDevices.getUserMedia({audio:true})
+    .then(stream => {handlerFunction(stream)})
+
+  function handlerFunction(stream) {
+    rec = new MediaRecorder(stream);
+    rec.ondataavailable = e => {
+      audioChunks.push(e.data);
+      if (rec.state == "inactive") {
+        let blob = new Blob(audioChunks, {type: 'audio/mpeg-3'});
+        recordedAudio.src = URL.createObjectURL(blob);
+        recordedAudio.controls = true;
+        recordedAudio.autoplay = true;
+        sendData(blob)
+      }
+    }
+  }
+
+  document.getElementById("record").onclick = e => {
+    console.log("I was clicked")
+    document.getElementById("record").disabled = true;
+    document.getElementById("record").style.backgroundcolor = "blue"
+    document.getElementById("stopRecord").disabled = false;
+    audioChunks = [];
+    rec.start()
+  }
+</script>
