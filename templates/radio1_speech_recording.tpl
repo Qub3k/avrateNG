@@ -36,6 +36,10 @@ Don't change the form attributes "action" and "method"-->
       <button type="submit" id="submitButton" class="btn-lg btn-success btn-block" style="margin-top: 2em;" onclick="log_position()" disabled>Submit and continue</button>
     <!-- </div> -->
   </form>
+  <p>
+    <button id="record"></button>
+    <button id="stopRecord" disabled>Stop</button>
+  </p>
 </div>
 
 <!-- this script enables the submit button after one option was checked -->
@@ -45,5 +49,4 @@ $(document).ready(function(){
         $("#submitButton").removeAttr("disabled");
     });
 });
-
 </script>
