@@ -2,7 +2,6 @@
 When creating custom forms copy this basic structure.
 Don't change the form attributes "action" and "method"-->
 
-
 <div class="container">
   <form id="form1" action="/save_rating?video_index={{video_index}}" method="post">
 
@@ -40,7 +39,13 @@ Don't change the form attributes "action" and "method"-->
     <button id="record"></button>
     <button id="stopRecord" disabled>Stop</button>
   </p>
+  <p>
+    <audio id="recordedAudio"></audio>
+  </p>
 </div>
+
+<!-- Add the logic handling audio recording -->
+<script src="/static/audio_recording.js"></script>
 
 <!-- this script enables the submit button after one option was checked -->
 <script>
@@ -49,35 +54,4 @@ $(document).ready(function(){
         $("#submitButton").removeAttr("disabled");
     });
 });
-</script>
-
-<!-- Logic behind speech recording -->
-<script>
-  /* Capture the audio stream from user's microphone */
-  /* TODO Finish implementing the logic allowing to record speech */
-  navigator.mediaDevices.getUserMedia({audio:true})
-    .then(stream => {handlerFunction(stream)})
-
-  function handlerFunction(stream) {
-    rec = new MediaRecorder(stream);
-    rec.ondataavailable = e => {
-      audioChunks.push(e.data);
-      if (rec.state == "inactive") {
-        let blob = new Blob(audioChunks, {type: 'audio/mpeg-3'});
-        recordedAudio.src = URL.createObjectURL(blob);
-        recordedAudio.controls = true;
-        recordedAudio.autoplay = true;
-        sendData(blob)
-      }
-    }
-  }
-
-  document.getElementById("record").onclick = e => {
-    console.log("I was clicked")
-    document.getElementById("record").disabled = true;
-    document.getElementById("record").style.backgroundcolor = "blue"
-    document.getElementById("stopRecord").disabled = false;
-    audioChunks = [];
-    rec.start()
-  }
 </script>
