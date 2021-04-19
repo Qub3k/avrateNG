@@ -52,6 +52,10 @@ Don't change the form attributes "action" and "method"-->
         <button class="stop">Stop</button>
       </div>
     </section>
+
+    <section class="sound-clips">
+      <!-- Here is where the recorded audio clips end up -->
+    </section>
   </div>
 </div>
 
