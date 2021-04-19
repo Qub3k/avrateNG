@@ -36,6 +36,8 @@ Don't change the form attributes "action" and "method"-->
     <!-- </div> -->
   </form>
   <!-- The first simplistic audio recording interface -->
+  <!-- TODO 1. Remove the elements related to the first simplistic solution -->
+  <!-- TODO 2. Redesign the response screen -->
   <p>
     <button id="record"></button>
     <button id="stopRecord" disabled>Stop</button>
