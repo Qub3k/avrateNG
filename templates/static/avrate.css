@@ -187,19 +187,19 @@ body {
   padding: 0.5rem 0;
 }
 
-#buttons {
+#recordingButtons {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
 
-#buttons button {
+#recordingButtons button {
   font-size: 1rem;
   padding: 1rem;
   width: calc(50% - 0.25rem);
 }
 
-button {
+button.record, button.stop {
   font-size: 1rem;
   background: #0088cc;
   text-align: center;
@@ -209,12 +209,12 @@ button {
   padding: 0.5rem;
 }
 
-button:hover, button:focus {
+#recordingButtons button:hover, #recordingButtons button:focus {
   box-shadow: inset 0px 0px 10px rgba(255, 255, 255, 1);
   background: #0ae;
 }
 
-button:active {
+#recordingButtons button:active {
   box-shadow: inset 0px 0px 20px rgba(0,0,0,0.5);
   transform: translateY(2px);
 }

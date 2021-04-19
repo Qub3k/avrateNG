@@ -47,7 +47,7 @@ Don't change the form attributes "action" and "method"-->
   <div class="wrapper">
     <section class="main-controls">
       <canvas class="visualizer" height="60px"></canvas>
-      <div id="buttons">
+      <div id="recordingButtons">
         <button class="record">Record</button>
         <button class="stop">Stop</button>
       </div>
