@@ -57,6 +57,8 @@ if (navigator.mediaDevices.getUserMedia) {
 
             stop.disabled = true;
             record.disabled = false;
+            // Enable the submit button once a speech sample has been recorded
+            document.getElementById("submitButton").removeAttribute("disabled")
         }
 
         mediaRecorder.onstop = function (e) {
