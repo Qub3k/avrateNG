@@ -35,16 +35,7 @@ Don't change the form attributes "action" and "method"-->
       <button type="submit" id="submitButton" class="btn-lg btn-success btn-block" style="margin-top: 2em;" onclick="log_position()" disabled>Submit and continue</button>
     <!-- </div> -->
   </form>
-  <!-- The first simplistic audio recording interface -->
-  <!-- TODO 1. Remove the elements related to the first simplistic solution -->
-  <!-- TODO 2. Redesign the response screen -->
-  <p>
-    <button id="record"></button>
-    <button id="stopRecord" disabled>Stop</button>
-  </p>
-  <p>
-    <audio id="recordedAudio"></audio>
-  </p>
+  <!-- TODO 1. Redesign the response screen -->
   <!-- The new approach (based on Mozilla's Web Dictaphone) -->
   <div class="wrapper">
     <section class="main-controls">
