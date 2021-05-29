@@ -2,8 +2,8 @@
 The JS part dynamically changes the value and width of the bar according to
 total number of videos in playlist and current video_index-->
 
-
-<div class="progress">
+<label>Progress</label>
+<div class="progress" style="height: 25px; background-color: gray">
   <div id="progress_bar" class="progress-bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" style="width:20%">
            {{video_index+1}} / {{video_count}}
   </div>

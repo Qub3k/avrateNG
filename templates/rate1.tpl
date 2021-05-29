@@ -6,7 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="Max" >
     <title>{{title}}</title>
+
+    <!-- Header (imports etc) -->
     % include('templates/header.tpl')
+
     <!-- track mouse positions -->
     <script src="/static/track_mouse.js"></script>
     <script>
@@ -15,7 +18,7 @@
             $("#submitButton").click(function(){
               // Fix issue with html5 validation
               const form = document.body.querySelector('#form1');
-              if (form.checkValidity && !form.checkValidity()) {
+              if (form.checkValidity() && !form.checkValidity()) {
                   return;
               }
               $("#playback").show();
@@ -31,35 +34,32 @@ video_index needs to be given as input -->
 
   <body>
     <div id="playback"></div>
-    <div class="container" id="content">
+    <div class="container" id="content" style="min-height: 100vh; display: flex; flex-direction: column; justify-content: space-between; ">
 
-      <div style="margin-top: 1em;"></div>
-      % include('templates/progressBar.tpl', video_index=video_index, video_count=video_count)
+      <div style="margin-top: 5em;">
+        <!-- Progress Bar -->
+        % include('templates/progressBar.tpl', video_index=video_index, video_count=video_count)
 
-      <div class="container">
-        <div class="row">
-            <div class="col">
-              <h5>{{question}}</h5>
-            </div>
-            <div class="col text-right">
-              <h5>User ID: {{user_id}}</h5>
-            </div>
+        <div class="container">
+          <div class="row">
+              <div class="col">
+                <h5>{{question}}</h5>
+              </div>
+              <div class="col text-right">
+                <h5>User ID: {{user_id}}</h5>
+              </div>
+          </div>
         </div>
+
+
+        <!-- Neccesary include, rating template -->
+        % include('templates/' + rating_template, video_index=video_index)
       </div>
-
-      <!--<div class="row" id="form-template"> -->
-        % include('templates/' + rating_template, video_index=video_index)   # replace with slider1.tpl or button1.tpl
-      <form method="post" id="tracking_form">
-
-      </form>
-        <br><br>
-
-      <!--</div> -->
-
-      % include('templates/footer.tpl')
-
+      <div>
+        <!-- Footer -->
+        % include('templates/footer.tpl')
+      </div>
     </div>
-
 
   </body>
 

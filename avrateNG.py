@@ -70,7 +70,7 @@ def play(config, video_index, playlist):
 
     def q(x):
         """ quote the video name for command line usage,
-        prevends problems with spaces in video filenames"""
+        prevents problems with spaces in video filenames"""
         return "\"" + x + "\""
 
     video = " ".join(map(q, config[playlist][video_index]))
@@ -210,22 +210,22 @@ def statistics(db, config):
                     rating_dict=json.dumps(rating_dict))
 
 
+def get_video_name(playlist, video_index, config):
+    video_name = config[playlist][int(video_index)]
+    # for supporting multiple files per playlist entry, here needs to be done some extension
+    if len(video_name) == 0:
+        # old style of storing, one video name per rating
+        video_name = video_name[0]
+    else:
+        # complex video name, e.g. two videos
+        video_name = str(video_name)
+    return video_name
+
 def store_rating_key_value_pair(db, config, user_id, timestamp, video_index, key, value, tracker, training=False):
     """
     store a given rating as a key value pair inside the sqlite3 table,
     further also timestamp and played video is stored
     """
-
-    def get_video_name(playlist, video_index, config):
-        video_name = config[playlist][int(video_index)]
-        # for supporting multiple files per playlist entry, here needs to be done some extension
-        if len(video_name) == 0:
-            # old style of storing, one video name per rating
-            video_name = video_name[0]
-        else:
-            # complex video name, e.g. two videos
-            video_name = str(video_name)
-        return video_name
 
     # Choose DB table to store the ratings
     if not training:
@@ -261,6 +261,60 @@ def store_rating_key_value_pair(db, config, user_id, timestamp, video_index, key
 
     return playlist
 
+def save_to_database(db, user_id, video_index, video_name, timestamp, file_path):
+    # Create table if it does not exist
+    db.execute('CREATE TABLE IF NOT EXISTS ratings (user_ID INTEGER, video_ID TEXT, video_name TEXT, audio_path TEXT, timestamp TEXT);')
+
+    db.execute('INSERT INTO ratings VALUES (?,?,?,?,?);', (user_id, video_index, video_name, file_path, timestamp))
+    db.commit()
+
+
+@route("/save_audio_rating", method="POST")
+@auth_basic(check_credentials)
+def save_audio_rating(db, config):
+    audio = request.files["audio_file"]
+    video_index = request.query.video_index
+    timestamp = str(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S %f'))  # define timestamp
+    user_id = int(request.get_cookie("user_id"))
+
+    filename = "vid_"+str(video_index)+"_user_"+str(user_id)+"_"+str(random.randint(1,100000))+".webm"
+    path = "AUDIO_RATINGS/"+filename
+
+    # Save audio file
+    with open(path, 'wb') as f:
+        stream = audio.file.read()
+        f.write(stream)
+
+    # Lookup the correct playlist
+    if config["shuffle"]:
+        playlist = "shuffled_playlist"
+    else:
+        playlist = "playlist"
+
+    training = int(request.get_cookie("training"))
+    video_name = get_video_name(playlist, video_index, config)
+
+    # Save data to database
+    save_to_database(db, user_id, video_index, video_name, timestamp, path)
+
+
+    # check if this was the last video in playlist
+    video_index = int(video_index) + 1
+    if video_index > len(config[playlist]) - 1:  # playlist over
+        if training == 1:
+            lInfo("training done")
+            response.set_cookie("training_state", "done", path="/")
+            redirect('/')
+        else:
+            lInfo("training not over")
+            response.set_cookie("training_state", "open", path="/")
+
+            if config['display_feedback_form']:
+                redirect('/feedback')
+            else:
+                redirect('/finish')
+    else:
+        redirect('/rate/' + str(video_index))  # next video
 
 @route('/save_rating', method='POST')
 @auth_basic(check_credentials)
@@ -342,7 +396,9 @@ def server(config, host="127.0.0.1"):
     """
     start the server part of avrateNG
     """
-    install(SQLitePlugin(dbfile='ratings.db'))
+
+
+    install(SQLitePlugin(dbfile=config["active_database"]))
     install(ConfigPlugin(config))
 
     lInfo("server starting.")

@@ -20,7 +20,7 @@ function checkCursor(){
 function log_position(){
     var pos_string = JSON.stringify(position);
     document.getElementById("mouse_track").value = pos_string;
-
+    return pos_string;
 }
 
 
