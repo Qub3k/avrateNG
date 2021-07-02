@@ -6,6 +6,7 @@
 
 // TODO 1. Remove the elements not necessary from the point of view of the ACR w/o the Scale experiment (e.g., the
 //  functionality of storing the clips)
+// TODO 2. Store the recorded speech sample on the disk
 
 // set up basic variables for app
 
