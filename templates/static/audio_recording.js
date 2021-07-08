@@ -47,7 +47,7 @@ if (navigator.mediaDevices.getUserMedia) {
 
         visualize(stream);
 
-        record.onclick = function () {
+        function start_recording(){
             mediaRecorder.start();
             console.log(mediaRecorder.state);
             console.log("recorder started");
@@ -56,8 +56,9 @@ if (navigator.mediaDevices.getUserMedia) {
             stop.disabled = false;
             record.disabled = true;
         }
+        start_recording();
 
-        stop.onclick = function () {
+        function stop_recording() {
             mediaRecorder.stop();
             console.log(mediaRecorder.state);
             console.log("recorder stopped");
@@ -66,10 +67,12 @@ if (navigator.mediaDevices.getUserMedia) {
             // mediaRecorder.requestData();
 
             stop.disabled = true;
+            stop.style.visibility = "hidden";
             record.disabled = false;
             // Enable the submit button once a speech sample has been recorded
             document.getElementById("submitButton").removeAttribute("disabled")
         }
+        stop.addEventListener("click", stop_recording);
 
         mediaRecorder.onstop = function (e) {
             console.log("data available after MediaRecorder.stop() called.");
@@ -101,7 +104,7 @@ if (navigator.mediaDevices.getUserMedia) {
 
             clipContainer.appendChild(audio);
             clipContainer.appendChild(clipLabel);
-            clipContainer.appendChild(deleteButton);
+            //clipContainer.appendChild(deleteButton);
             soundClips.appendChild(clipContainer);
 
             audio.controls = true;
@@ -147,7 +150,8 @@ if (navigator.mediaDevices.getUserMedia) {
 
     navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError);
 
-} else {
+}
+else {
     console.log('getUserMedia not supported on your browser!');
 }
 
@@ -213,3 +217,5 @@ window.onresize = function () {
 }
 
 window.onresize();
+
+

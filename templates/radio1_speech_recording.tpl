@@ -7,8 +7,8 @@ Don't change the form attributes "action" and "method"-->
   <div class="row" >
     <section class="main-controls" style="width: 100%;">
       <canvas class="visualizer" height="60px"></canvas>
-      <div id="recordingButtons" style="width: 100%">
-        <button class="record">Record</button>
+      <div id="recordingButtons" style="width: 100%; display: flex; justify-content: center">
+        <button class="record" style="display: none">Record</button>
         <button class="stop">Stop</button>
       </div>
     </section>
