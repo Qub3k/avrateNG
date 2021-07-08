@@ -9,7 +9,7 @@ Don't change the form attributes "action" and "method"-->
       <canvas class="visualizer" height="60px"></canvas>
       <div id="recordingButtons" style="width: 100%; display: flex; justify-content: center">
         <button class="record" style="display: none">Record</button>
-        <button class="stop">Stop</button>
+        <button class="stop" style="color: white">Stop Recording</button>
       </div>
     </section>
 
