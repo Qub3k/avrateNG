@@ -9,6 +9,7 @@ libs/__pycache__
 
 .gradle/
 ./AUDIO_RATINGS/*
+AUDIO_RATINGS/*
 sqlite3.exe
 
 
