@@ -24,6 +24,7 @@ import time
 import datetime
 import random
 from platform import system
+import uuid
 
 # load libs from lib directory
 import loader
@@ -277,7 +278,7 @@ def save_audio_rating(db, config):
     timestamp = str(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S %f'))  # define timestamp
     user_id = int(request.get_cookie("user_id"))
 
-    filename = "vid_"+str(video_index)+"_user_"+str(user_id)+"_"+str(random.randint(1,100000))+".webm"
+    filename = "vid_"+str(video_index)+"_user_"+str(user_id)+"_"+str(uuid.uuid4())+".webm"
     path = "AUDIO_RATINGS/"+filename
 
     # Save audio file
