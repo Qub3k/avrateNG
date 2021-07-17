@@ -127,6 +127,11 @@ if (navigator.mediaDevices.getUserMedia) {
                 }
             }
 
+            // Pause audio playback after clicking submit button
+            document.getElementById("submitButton").onclick = () =>{
+                audio.pause();
+            }
+
             clipLabel.onclick = function () {
                 const existingName = clipLabel.textContent;
                 const newClipName = prompt('Enter a new name for your sound clip');

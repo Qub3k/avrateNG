@@ -48,6 +48,8 @@ from bottle_config import ConfigPlugin
 
 from post_rating import *
 
+from datetime import date
+from datetime import datetime
 
 def check_credentials(username, password):
     """
@@ -275,10 +277,13 @@ def save_to_database(db, user_id, video_index, video_name, timestamp, file_path)
 def save_audio_rating(db, config):
     audio = request.files["audio_file"]
     video_index = request.query.video_index
-    timestamp = str(datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S %f'))  # define timestamp
+    date_now = str(date.today())
+    time_now = datetime.now().strftime("%H-%M-%S")
     user_id = int(request.get_cookie("user_id"))
 
-    filename = "vid_"+str(video_index)+"_user_"+str(user_id)+"_"+str(uuid.uuid4())+".webm"
+    timestamp = str(datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S %f'))  # define timestamp for database
+
+    filename = "user_"+str(user_id)+"_vid_"+str(video_index)+"___"+str(time_now)+"___"+str(date_now)+"___"+str(uuid.uuid4())+".webm"
     path = "AUDIO_RATINGS/"+filename
 
     # Save audio file

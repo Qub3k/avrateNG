@@ -13,6 +13,9 @@ AUDIO_RATINGS/*
 sqlite3.exe
 
 
+./avrateNG_venv
+./avrateNG_venv/*
+
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
@@ -84,3 +87,4 @@ fabric.properties
 
 ## PC station-specific files
 .idea
+/avrateNG_venv/
