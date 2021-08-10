@@ -1,6 +1,6 @@
 @echo off
 setlocal enableextensions enabledelayedexpansion
-path %SystemRoot%\System32;%SystemRoot%;%SystemRoot%\System32\Wbem
+path %SystemRoot%\System32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SystemRoot%\System32\WindowsPowerShell\v1.0\
 
 :: Unattended install flag. When set, the script will not require user input.
 set unattended=no
@@ -174,6 +174,9 @@ call :add_type ""                                 "audio" "CUE Sheet"           
 :: Register "Default Programs" entry
 call :reg add "HKLM\SOFTWARE\RegisteredApplications" /v "mpv" /d "SOFTWARE\Clients\Media\mpv\Capabilities" /f
 
+:: Add start menu link
+powershell "$s=(New-Object -COM WScript.Shell).CreateShortcut('%ProgramData%\Microsoft\Windows\Start Menu\Programs\mpv.lnk');$s.TargetPath='%mpv_path%';$s.Save()"
+
 echo.
 echo Installed successfully^^! You can now configure mpv's file associations in the
 echo Default Programs control panel.
@@ -251,10 +254,10 @@ exit 0
 	set prog_id=%~1
 	set friendly_name=%~2
 
-	:: Add ProgId, edit flags are FTA_OpenIsSafe | FTA_AlwaysUseDirectInvoke
+	:: Add ProgId, edit flags are FTA_OpenIsSafe
 	set prog_id_key=%classes_root_key%\%prog_id%
 	call :reg add "%prog_id_key%" /d "%friendly_name%" /f
-	call :reg add "%prog_id_key%" /v "EditFlags" /t REG_DWORD /d 4259840 /f
+	call :reg add "%prog_id_key%" /v "EditFlags" /t REG_DWORD /d 65536 /f
 	call :reg add "%prog_id_key%" /v "FriendlyTypeName" /d "%friendly_name%" /f
 	call :reg add "%prog_id_key%\DefaultIcon" /d "%icon_path%" /f
 	call :add_verbs "%prog_id_key%"

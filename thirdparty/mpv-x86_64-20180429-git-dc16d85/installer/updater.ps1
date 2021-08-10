@@ -4,7 +4,7 @@ function Check-7z {
     {
         $download_file = (Get-Location).Path + "\7z.zip"
         Write-Host "Downloading 7z" -ForegroundColor Green
-        Invoke-WebRequest -Uri "http://download.sourceforge.net/sevenzip/7za920.zip" -UserAgent [Microsoft.PowerShell.Commands.PSUserAgent]::FireFox -OutFile $download_file
+        Invoke-WebRequest -Uri "https://download.sourceforge.net/sevenzip/7za920.zip" -UserAgent [Microsoft.PowerShell.Commands.PSUserAgent]::FireFox -OutFile $download_file
         Write-Host "Extracting 7z" -ForegroundColor Green
         Add-Type -AssemblyName System.IO.Compression.FileSystem
         [System.IO.Compression.ZipFile]::ExtractToDirectory($download_file, $7zdir)
@@ -40,13 +40,15 @@ function Check-Mpv {
 
 function Download-Mpv ($filename) {
     Write-Host "Downloading" $filename -ForegroundColor Green
-    $link = "http://download.sourceforge.net/mpv-player-windows/" + $filename
+    $global:progressPreference = 'Continue'
+    $link = "https://download.sourceforge.net/mpv-player-windows/" + $filename
     Invoke-WebRequest -Uri $link -UserAgent [Microsoft.PowerShell.Commands.PSUserAgent]::FireFox -OutFile $filename
 }
 
 function Download-Youtubedl ($version) {
     Write-Host "Downloading youtube-dl ($version)" -ForegroundColor Green
-    $link = "https://github.com/rg3/youtube-dl/releases/download/" + $version + "/youtube-dl.exe"
+    $global:progressPreference = 'Continue'
+    $link = "https://yt-dl.org/downloads/" + $version + "/youtube-dl.exe"
     Invoke-WebRequest -Uri $link -UserAgent [Microsoft.PowerShell.Commands.PSUserAgent]::FireFox -OutFile "youtube-dl.exe"
 }
 
@@ -73,10 +75,12 @@ function Get-Latest-Mpv($Arch) {
 }
 
 function Get-Latest-Youtubedl {
-    $link = "https://github.com/rg3/youtube-dl/releases.atom"
+    $link = "https://yt-dl.org/downloads/latest/youtube-dl.exe"
     Write-Host "Fetching RSS feed for youtube-dl" -ForegroundColor Green
-    $result = [xml](New-Object System.Net.WebClient).DownloadString($link)
-    $version = $result.feed.entry[0].title.split(" ")[-1]
+    $global:progressPreference = 'silentlyContinue'
+    $resp = Invoke-WebRequest $link -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing
+    $redirect_link = $resp.Headers.Location
+    $version = $redirect_link.split("/")[4]
     return $version
 }
 
@@ -121,6 +125,20 @@ function ExtractGitFromURL($filename) {
     return $matches[1]
 }
 
+function ExtractDateFromFile {
+    $date = (Get-Item ./mpv.exe).LastWriteTimeUtc
+    $day = $date.Day.ToString("00")
+    $month = $date.Month.ToString("00")
+    $year = $date.Year.ToString("0000")
+    return "$year$month$day"
+}
+
+function ExtractDateFromURL($filename) {
+    $pattern = "mpv-[xi864_]*-([0-9]{8})-git-([a-z0-9-]{7})"
+    $bool = $filename -match $pattern
+    return $matches[1]
+}
+
 function Test-Admin
 {
     $user = [Security.Principal.WindowsIdentity]::GetCurrent();
@@ -135,10 +153,21 @@ function Upgrade-Mpv {
     if (Check-Mpv) {
         $arch = (Get-Arch).FileType
         $remoteName = Get-Latest-Mpv $arch
-        if ((ExtractGitFromFile) -match (ExtractGitFromURL $remoteName))
+        $localgit = ExtractGitFromFile
+        $localdate = ExtractDateFromFile
+        $remotegit = ExtractGitFromURL $remoteName
+        $remotedate = ExtractDateFromURL $remoteName
+        if ($localgit -match $remotegit)
         {
-            Write-Host "You are already using latest mpv build -- $remoteName" -ForegroundColor Green
-            $need_download = $false
+            if ($localdate -match $remotedate)
+            {
+                Write-Host "You are already using latest mpv build -- $remoteName" -ForegroundColor Green
+                $need_download = $false
+            }
+            else {
+                Write-Host "Newer mpv build available" -ForegroundColor Green
+                $need_download = $true
+            }
         }
         else {
             Write-Host "Newer mpv build available" -ForegroundColor Green
