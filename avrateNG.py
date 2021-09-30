@@ -25,6 +25,8 @@ import datetime
 import random
 from platform import system
 import uuid
+import subprocess
+
 
 # load libs from lib directory
 import loader
@@ -85,8 +87,9 @@ def play(config, video_index, playlist):
         lInfo("use gray video before and after: {}".format(video))
     lInfo("player command")
     print(config["player"].format(filename=video))
-    shell_call(config["player"].format(filename=video))
-
+    #shell_call(config["player"].format(filename=video))
+    #subprocess.call(config["player"].format(filename=video))
+    subprocess.Popen(config["player"].format(filename=video), shell=True, stdout=subprocess.PIPE)
 
 @route('/')  # Welcome screen
 @auth_basic(check_credentials)
@@ -151,7 +154,12 @@ def rate(db, config, video_index):
 
     # play video only on first visit
     if play_video == 1:
+        #IMPORTANT Here is the command that plays the video
+        # HTTP response is not returned until the end of the video playback
+        #
+        print("BEFORE PLAYING THE VIDEO COMMAND")
         play(config, video_index, playlist)
+        print("JUST AFTER PLAY VIDEO COMMAND")
         # play just one time
         play_video = 0
         session_state = session_state + 1
