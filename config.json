@@ -15,7 +15,7 @@
   "display_feedback_form": false,
   "demographics_form": false,
   "gray_video": "videos/gray.mkv",
-  "no_video_playback": true,
+  "no_video_playback": false,
   "question": "What is your opinion of the video quality?",
   "active_database": "audio_recordings.db"
 }
