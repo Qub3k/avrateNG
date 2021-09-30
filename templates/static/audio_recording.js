@@ -10,15 +10,21 @@
 
 // set up basic variables for app
 
+let audio_recording_blob;
+
+
 const record = document.querySelector('.record');
 const stop = document.querySelector('.stop');
 const soundClips = document.querySelector('.sound-clips');
 const canvas = document.querySelector('.visualizer');
 const mainSection = document.querySelector('.main-controls');
 
-// disable stop button while not recording
+const audio_limit = 1;
+let audio_index = 0;
 
+// disable stop button while not recording
 stop.disabled = true;
+
 
 // visualiser setup - create web audio api context and canvas
 
@@ -34,11 +40,15 @@ if (navigator.mediaDevices.getUserMedia) {
     let chunks = [];
 
     let onSuccess = function (stream) {
-        const mediaRecorder = new MediaRecorder(stream);
+        const options = {
+            audioBitsPerSecond: 128000,
+            mimeType: "audio/webm; codecs=opus"
+        }
+        const mediaRecorder = new MediaRecorder(stream, options);
 
         visualize(stream);
 
-        record.onclick = function () {
+        function start_recording(){
             mediaRecorder.start();
             console.log(mediaRecorder.state);
             console.log("recorder started");
@@ -47,8 +57,9 @@ if (navigator.mediaDevices.getUserMedia) {
             stop.disabled = false;
             record.disabled = true;
         }
+        start_recording();
 
-        stop.onclick = function () {
+        function stop_recording() {
             mediaRecorder.stop();
             console.log(mediaRecorder.state);
             console.log("recorder stopped");
@@ -57,15 +68,24 @@ if (navigator.mediaDevices.getUserMedia) {
             // mediaRecorder.requestData();
 
             stop.disabled = true;
+            stop.style.visibility = "hidden";
             record.disabled = false;
             // Enable the submit button once a speech sample has been recorded
             document.getElementById("submitButton").removeAttribute("disabled")
         }
+        stop.addEventListener("click", stop_recording);
 
         mediaRecorder.onstop = function (e) {
             console.log("data available after MediaRecorder.stop() called.");
 
-            const clipName = prompt('Enter a name for your sound clip', 'My unnamed clip');
+            //const clipName = prompt('Enter a name for your sound clip', 'My unnamed clip');
+            audio_index += 1;
+            const clipName = "audio_"+audio_index+".webm";
+
+            if (audio_index >= audio_limit){
+                record.disabled = true
+                stop.disabled = true
+            }
 
             const clipContainer = document.createElement('article');
             const clipLabel = document.createElement('p');
@@ -85,19 +105,32 @@ if (navigator.mediaDevices.getUserMedia) {
 
             clipContainer.appendChild(audio);
             clipContainer.appendChild(clipLabel);
-            clipContainer.appendChild(deleteButton);
+            //clipContainer.appendChild(deleteButton);
             soundClips.appendChild(clipContainer);
 
             audio.controls = true;
-            const blob = new Blob(chunks, {'type': 'audio/ogg; codecs=opus'});
+            audio_recording_blob = new Blob(chunks, {"type": "audio/webm; codecs=opus"});
             chunks = [];
-            const audioURL = window.URL.createObjectURL(blob);
+            const audioURL = window.URL.createObjectURL(audio_recording_blob);
             audio.src = audioURL;
             console.log("recorder stopped");
 
             deleteButton.onclick = function (e) {
                 let evtTgt = e.target;
                 evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
+
+                audio_index -= 1;
+                if(audio_index<audio_limit){
+                    record.disabled = false;
+                }
+                if(audio_index == 0){
+                    document.getElementById("submitButton").setAttribute("disabled", true);
+                }
+            }
+
+            // Pause audio playback after clicking submit button
+            document.getElementById("submitButton").onclick = () =>{
+                audio.pause();
             }
 
             clipLabel.onclick = function () {
@@ -106,9 +139,10 @@ if (navigator.mediaDevices.getUserMedia) {
                 if (newClipName === null) {
                     clipLabel.textContent = existingName;
                 } else {
-                    clipLabel.textContent = newClipName;
+                    clipLabel.textContent = newClipName+".webm";
                 }
             }
+
         }
 
         mediaRecorder.ondataavailable = function (e) {
@@ -122,7 +156,8 @@ if (navigator.mediaDevices.getUserMedia) {
 
     navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError);
 
-} else {
+}
+else {
     console.log('getUserMedia not supported on your browser!');
 }
 
@@ -188,3 +223,5 @@ window.onresize = function () {
 }
 
 window.onresize();
+
+
