@@ -89,7 +89,7 @@ def play(config, video_index, playlist):
     print(config["player"].format(filename=video))
     #shell_call(config["player"].format(filename=video))
     #subprocess.call(config["player"].format(filename=video))
-    subprocess.Popen(config["player"].format(filename=video), shell=True, stdout=subprocess.PIPE)
+    subprocess.Popen(config["player"].format(filename=video), shell=True, stdout=None)
 
 @route('/')  # Welcome screen
 @auth_basic(check_credentials)

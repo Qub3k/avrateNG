@@ -157,14 +157,18 @@ body {
   width: calc(50% - 0.25rem);
 }
 
-button.record, button.stop {
-  font-size: 1rem;
+button.stop {
+  width: 100%;
+  font-size: 1.1rem;
   background: #0088cc;
   text-align: center;
   color: white;
   border: none;
   transition: all 0.2s;
   padding: 0.5rem;
+  border-radius: 5px;
+  font-weight: bold;
+  margin-top: 2em;
 }
 
 #recordingButtons button:hover, #recordingButtons button:focus {

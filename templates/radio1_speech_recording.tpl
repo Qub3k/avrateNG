@@ -9,14 +9,14 @@ Don't change the form attributes "action" and "method"-->
       <canvas class="visualizer" height="60px"></canvas>
       <div id="recordingButtons" style="width: 100%; display: flex; justify-content: center">
         <button class="record" style="display: none">Record</button>
-        <button class="stop" style="color: white">Stop Recording</button>
+        <button class="stop" style="color: white; width:100%;">Submit and continue</button> <!-- In fact this is the STOP button -->
       </div>
     </section>
 
 
   </div>
   <div class="row">
-    <section class="sound-clips" >
+    <section class="sound-clips"  style="display: none">
       <!-- Here is where the recorded audio clips end up -->
     </section>
   </div>
@@ -27,8 +27,8 @@ Don't change the form attributes "action" and "method"-->
       <input type="hidden" id="mouse_track" name="mouse_track" value=""/>
 
       <!--<div class="row"> -->
-      <button type="submit" id="submitButton" class="btn-lg btn-success btn-block w-100" style="margin-top: 2em;"
-              disabled>Submit and continue</button>
+      <button type="submit" id="submitButton" class="btn-lg btn-success btn-block w-100" style="margin-top: 2em; display: none"
+              >Submit and continue</button>
       <!-- </div> -->
     </form>
   </div>
@@ -41,32 +41,27 @@ Don't change the form attributes "action" and "method"-->
 <script>
   const submit_audio_rating = (event) =>{
     event.preventDefault();
+
     const mouse_track = log_position();
-
-
     // Create formData with needed data
     const formData = new FormData();
     formData.append('audio_file', audio_recording_blob)
     formData.append('mouse_track', mouse_track)
-
     console.log(formData);
-
     const url = "/save_audio_rating?video_index={{video_index}}";
-
     // Post data to the server - only audio recording for now
     fetch(url, {
       method: "POST",
       body: formData
     })
-    .then(res=>{
-      console.log(res);
-      // VERY IMPORTANT LINE BELOW REDIRECTING WORKS A BIT DIFFERENT WHEN USING FETCH/AXIOS
-      // REDIRECTION URL IS CONTAINED IN RESPONSE, WE HAVE TO MANUALLY CHANGE IT
-      window.location.href = res.url;
-    })
-    .catch(err=>{
-      console.log(err);
-    })
+            .then(res=>{
+              console.log(res);
+              // VERY IMPORTANT LINE BELOW REDIRECTING WORKS A BIT DIFFERENT WHEN USING FETCH/AXIOS
+              // REDIRECTION URL IS CONTAINED IN RESPONSE, WE HAVE TO MANUALLY CHANGE IT
+              window.location.href = res.url;
+            })
+            .catch(err=>{
+              console.log(err);
+            })
   }
-
 </script>

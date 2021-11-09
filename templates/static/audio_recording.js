@@ -10,16 +10,16 @@
 
 // set up basic variables for app
 
-let audio_recording_blob;
-
 
 const record = document.querySelector('.record');
 const stop = document.querySelector('.stop');
 const soundClips = document.querySelector('.sound-clips');
 const canvas = document.querySelector('.visualizer');
 const mainSection = document.querySelector('.main-controls');
-
 const audio_limit = 1;
+
+let audio_recording_blob;
+let mediaRecorder = undefined
 let audio_index = 0;
 
 // disable stop button while not recording
@@ -27,82 +27,84 @@ stop.disabled = true;
 
 
 // visualiser setup - create web audio api context and canvas
-
 let audioCtx;
 const canvasCtx = canvas.getContext("2d");
 
-//main block for doing the audio recording
+
 
 if (navigator.mediaDevices.getUserMedia) {
+    // That means user media are supported
     console.log('getUserMedia supported.');
 
     const constraints = {audio: true};
     let chunks = [];
+
+
+    function start_recording(){
+        mediaRecorder.start();
+        console.log(mediaRecorder.state);
+        console.log("recorder started");
+        record.style.background = "red";
+
+        stop.disabled = false;
+        record.disabled = true;
+    }
+
+    function stop_recording() {
+        mediaRecorder.stop();
+        console.log(mediaRecorder.state);
+        console.log("recorder stopped");
+        record.style.background = "";
+        record.style.color = "";
+
+        stop.disabled = true;
+        stop.style.visibility = "hidden";
+        record.disabled = false;
+        // Enable the submit button once a speech sample has been recorded
+        document.getElementById("submitButton").removeAttribute("disabled")
+    }
+
+    function submit_audio(){
+        console.log("TODO SUBMIT AUDIO")
+    }
+
 
     let onSuccess = function (stream) {
         const options = {
             audioBitsPerSecond: 128000,
             mimeType: "audio/webm; codecs=opus"
         }
-        const mediaRecorder = new MediaRecorder(stream, options);
-
+        mediaRecorder = new MediaRecorder(stream, options);
         visualize(stream);
-
-        function start_recording(){
-            mediaRecorder.start();
-            console.log(mediaRecorder.state);
-            console.log("recorder started");
-            record.style.background = "red";
-
-            stop.disabled = false;
-            record.disabled = true;
-        }
         start_recording();
-
-        function stop_recording() {
-            mediaRecorder.stop();
-            console.log(mediaRecorder.state);
-            console.log("recorder stopped");
-            record.style.background = "";
-            record.style.color = "";
-            // mediaRecorder.requestData();
-
-            stop.disabled = true;
-            stop.style.visibility = "hidden";
-            record.disabled = false;
-            // Enable the submit button once a speech sample has been recorded
-            document.getElementById("submitButton").removeAttribute("disabled")
-        }
         stop.addEventListener("click", stop_recording);
 
+        // Handle audio file after recording stops
         mediaRecorder.onstop = function (e) {
             console.log("data available after MediaRecorder.stop() called.");
 
-            //const clipName = prompt('Enter a name for your sound clip', 'My unnamed clip');
             audio_index += 1;
             const clipName = "audio_"+audio_index+".webm";
 
             if (audio_index >= audio_limit){
-                record.disabled = true
+                //record.disabled = true
                 stop.disabled = true
             }
 
+            // Handle audio playback bar
             const clipContainer = document.createElement('article');
             const clipLabel = document.createElement('p');
             const audio = document.createElement('audio');
             const deleteButton = document.createElement('button');
-
             clipContainer.classList.add('clip');
             audio.setAttribute('controls', '');
             deleteButton.textContent = 'Delete';
             deleteButton.className = 'delete';
-
             if (clipName === null) {
                 clipLabel.textContent = 'My unnamed clip';
             } else {
                 clipLabel.textContent = clipName;
             }
-
             clipContainer.appendChild(audio);
             clipContainer.appendChild(clipLabel);
             //clipContainer.appendChild(deleteButton);
@@ -115,6 +117,7 @@ if (navigator.mediaDevices.getUserMedia) {
             audio.src = audioURL;
             console.log("recorder stopped");
 
+            /*
             deleteButton.onclick = function (e) {
                 let evtTgt = e.target;
                 evtTgt.parentNode.parentNode.removeChild(evtTgt.parentNode);
@@ -127,12 +130,14 @@ if (navigator.mediaDevices.getUserMedia) {
                     document.getElementById("submitButton").setAttribute("disabled", true);
                 }
             }
+             */
 
             // Pause audio playback after clicking submit button
             document.getElementById("submitButton").onclick = () =>{
                 audio.pause();
             }
 
+            /*
             clipLabel.onclick = function () {
                 const existingName = clipLabel.textContent;
                 const newClipName = prompt('Enter a new name for your sound clip');
@@ -142,7 +147,10 @@ if (navigator.mediaDevices.getUserMedia) {
                     clipLabel.textContent = newClipName+".webm";
                 }
             }
+             */
 
+            // Submit audio recording
+            document.getElementById("submitButton").click()
         }
 
         mediaRecorder.ondataavailable = function (e) {
@@ -156,10 +164,20 @@ if (navigator.mediaDevices.getUserMedia) {
 
     navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onError);
 
+
+    function test(){
+        console.log(" IA M TEST I A M TEST")
+    }
 }
 else {
     console.log('getUserMedia not supported on your browser!');
 }
+
+
+
+
+
+
 
 function visualize(stream) {
     if (!audioCtx) {
