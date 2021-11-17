@@ -306,6 +306,8 @@ def save_audio_rating(db, config):
         playlist = "playlist"
 
     training = int(request.get_cookie("training"))
+    if training == 1:  # Use the training playlist if the training session is active
+        playlist = "trainingsplaylist"
     video_name = get_video_name(playlist, video_index, config)
 
     # Save data to database
