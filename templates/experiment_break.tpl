@@ -32,6 +32,7 @@
             background-color: #BAE0FF;
             padding: 3em;
             border-radius: 10px;
+            min-height: 250px;
         }
         h1{
             margin: 0
@@ -50,9 +51,23 @@
             color: white;
             width: 100%;
             cursor: pointer;
+            animation: fadein 1.5s ease-in;
+        }
+        @keyframes fadein {
+            0%{
+                opacity: 0%;
+            },
+            100%{
+                opacity: 100%;
+            }
         }
         button:hover{
             background-color: #28a745;
+        }
+        #counter{
+            animation: fadein 4s ease-in;
+            font-family: 'Raleway', sans-serif;
+            font-size: 32px;
         }
 
     </style>
@@ -63,10 +78,45 @@
     <div class="container">
         <h1> Experiment Break </h1>
         <h3> Please take your time and press button below when ready.</h3>
-        <form action="/rate/{{video_index}}" style="width: 100%">
-            <button type="submit"> Continue </button>
+        <form action="/rate/{{video_index}}" style="width: 100%; height: 50px; display: flex; align-items: center; justify-content: center;">
+            <button id="continue-btn" type="submit" style="display: none"> Continue </button>
+            <span id="counter"></span>
         </form>
     </div>
 </body>
 
+<script>
+    let counter = parseInt({{break_duration_sec}})
+    console.log(counter)
+
+
+    start()
+
+    function start(){
+        document.getElementById("counter").innerText = counterFormat(counter)
+
+        setInterval(() => {
+            console.log(counter)
+            if(counter >= 2){
+                counter -= 1
+                document.getElementById("counter").innerText = counterFormat(counter)
+            }
+            else if(counter === 1){
+                document.getElementById("continue-btn").style.display = "unset"
+                document.getElementById("counter").style.display = "none"
+            }
+        }, 1000)
+    }
+
+    function counterFormat(value){
+        const minutes = Math.floor(value/(60))
+        const seconds = value%(60)
+
+        const seconds_str = seconds > 9 ? seconds : `0${seconds}`
+
+        return `${minutes} : ${seconds_str}`
+    }
+
+
+</script>
 </html>

@@ -331,22 +331,15 @@ def save_audio_rating(db, config):
                 redirect('/finish')
     else:
         if int(video_index) in config["break_index"]:
-            redirect('/experiment_break/' + str(video_index))  # next video
+            redirect(f"/experiment_break/{str(video_index)}/{config['break_duration_sec']}")
         else:
             redirect('/rate/' + str(video_index))  # next video
 
-@route("/experiment_break/<video_index>", method="GET")
+@route("/experiment_break/<video_index>/<break_duration_sec>", method="GET")
 @auth_basic(check_credentials)
-def experiment_break(db, config, video_index):
+def experiment_break(config, video_index, break_duration_sec):
     video_index = int(video_index)
-    return template(config["template_folder"] + "/experiment_break.tpl", title="AvRateNG", video_index=video_index)
-
-
-    '''return template(config["template_folder"] + "/rate1.tpl", title="AvRateNG",
-            rating_template=config["rating_template"], video_index=video_index,
-            video_count=len(config[playlist]), user_id=user_id,
-            question=config.get("question", "add question to config.json"))'''
-
+    return template(config["template_folder"] + "/experiment_break.tpl", title="AvRateNG", video_index=video_index, break_duration_sec=break_duration_sec)
 
 
 @route('/save_rating', method='POST')

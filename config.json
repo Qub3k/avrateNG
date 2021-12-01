@@ -18,5 +18,6 @@
   "no_video_playback": false,
   "question": "What is your opinion of the video quality?",
   "active_database": "audio_recordings.db",
-  "break_index": [0,1,2]
+  "break_index": [1],
+  "break_duration_sec": 70
 }
