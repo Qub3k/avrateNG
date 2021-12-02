@@ -6,7 +6,7 @@
   "http_port": "12347",
   "playlist": "playlist.list",
   "template_folder": "templates",
-  "training": false,
+  "training": true,
   "trainingsplaylist": "training.list",
   "rating_template": "radio1_speech_recording.tpl",
   "voiceRecognition": false,
@@ -19,5 +19,5 @@
   "question": "What is your opinion of the video quality?",
   "active_database": "audio_recordings.db",
   "break_index": [1],
-  "break_duration_sec": 70
+  "break_duration_sec": 10
 }

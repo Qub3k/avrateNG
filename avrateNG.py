@@ -114,8 +114,8 @@ def welcome(db, config):
 
     # check if training stage is wished and/or training has already finished:
     if config["trainingsplaylist"]:  # check if training switch is toggled
-        if not request.get_cookie(
-                "training_state") == "done":  # Cookie that controls if training was already done or is still open
+        if not request.get_cookie("training_state") == "done":  # Cookie that controls if training was already done or is still open
+            # If training_state is not set to done it is then set to open and training session is enabled #IMPORTANT (see /save_audio_rating endpoint)
             response.set_cookie("training_state", "open", path="/")
             response.set_cookie("training", "1", path="/")
             return template(config["template_folder"] + "/training_welcome.tpl", title="AvRateNG", user_id=user_id)
@@ -157,9 +157,9 @@ def rate(db, config, video_index):
         #IMPORTANT Here is the command that plays the video
         # HTTP response is not returned until the end of the video playback
         #
-        print("BEFORE PLAYING THE VIDEO COMMAND")
+
         play(config, video_index, playlist)
-        print("JUST AFTER PLAY VIDEO COMMAND")
+
         # play just one time
         play_video = 0
         session_state = session_state + 1
@@ -314,6 +314,12 @@ def save_audio_rating(db, config):
     save_to_database(db, user_id, video_index, video_name, timestamp, path)
 
 
+    # Change state of training to open after first video assessment submit (look welcome "/" view)
+    if int(video_index) == 0 and int(request.get_cookie("training")) == 0 and request.get_cookie("training_state") == "done":
+        print("RESETTING TRAINING SESSION")
+        response.set_cookie("training_state", "open", path="/")
+
+
     # check if this was the last video in playlist
     video_index = int(video_index) + 1
     if video_index > len(config[playlist]) - 1:  # playlist over
@@ -342,6 +348,7 @@ def experiment_break(config, video_index, break_duration_sec):
     return template(config["template_folder"] + "/experiment_break.tpl", title="AvRateNG", video_index=video_index, break_duration_sec=break_duration_sec)
 
 
+'''
 @route('/save_rating', method='POST')
 @auth_basic(check_credentials)
 def saveRating(db, config):
@@ -390,7 +397,7 @@ def saveRating(db, config):
                 redirect('/finish')
     else:
         redirect('/rate/' + str(video_index))  # next video
-
+'''
 
 @route('/save_demographics', method='POST')
 @auth_basic(check_credentials)
