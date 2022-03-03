@@ -97,13 +97,18 @@ def welcome(db, config):
     """
     welcome screen
     """
+
+    # Getting user_id and incrementing it later only in the beginning of training session
+    #user_id = int(db.execute('SELECT max(user_ID) from ratings').fetchone()[0])
+    '''
     # for every new start ("/"): user_id (cookie) is incremented by 1
     if not db.execute("SELECT * FROM sqlite_master WHERE type='table' AND name='ratings'").fetchone():
         user_id = 1  # if ratings table does not exist: first user_id = 1
     else:
-        user_id = int(db.execute('SELECT max(user_ID) from ratings').fetchone()[
-                          0]) + 1  # new user_ID is always old (highest) user_ID+1
-    response.set_cookie("user_id", str(user_id), path="/")
+        user_id = int(db.execute('SELECT max(user_ID) from ratings').fetchone()[0]) + 1  # new user_ID is always old (highest) user_ID+1
+    '''
+    #response.set_cookie("user_id", str(user_id), path="/") # Moved this line so it will be executed only if training session begins
+
 
     # initialize session_state variable (throws error when refreshing the page or going back)
     response.set_cookie("session_state", "0", path="/")
@@ -118,13 +123,14 @@ def welcome(db, config):
             # If training_state is not set to done it is then set to open and training session is enabled #IMPORTANT (see /save_audio_rating endpoint)
             response.set_cookie("training_state", "open", path="/")
             response.set_cookie("training", "1", path="/")
-            return template(config["template_folder"] + "/training_welcome.tpl", title="AvRateNG", user_id=user_id)
+            response.set_cookie("user_id", str(random.randint(100000000, 999999999)), path="/")  # Updating user_id cookie only in beginning of training session
+            return template(config["template_folder"] + "/training_welcome.tpl", title="AvRateNG")
         else:
             response.set_cookie("training", "0", path="/")
-            return template(config["template_folder"] + "/welcome.tpl", title="AvRateNG", user_id=user_id)
+            return template(config["template_folder"] + "/welcome.tpl", title="AvRateNG")
     else:
         response.set_cookie("training", "0", path="/")
-        return template(config["template_folder"] + "/welcome.tpl", title="AvRateNG", user_id=user_id)
+        return template(config["template_folder"] + "/welcome.tpl", title="AvRateNG")
 
 
 @route('/rate/<video_index>')  # Rating screen with video_index as variable
@@ -291,7 +297,7 @@ def save_audio_rating(db, config):
 
     timestamp = str(datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S %f'))  # define timestamp for database
 
-    filename = "user_"+str(user_id)+"_vid_"+str(video_index)+"___"+str(time_now)+"___"+str(date_now)+"___"+str(uuid.uuid4())+".webm"
+    filename = "user_"+str(user_id)+"_vid_"+str(video_index)+"___"+str(date_now)+"T"+str(time_now)+"___"+str(uuid.uuid4())+".webm"
     path = "AUDIO_RATINGS/"+filename
 
     # Save audio file

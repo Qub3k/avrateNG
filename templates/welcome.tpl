@@ -18,7 +18,7 @@
       -->
       <a class="btn btn-large btn-success" href="/info" id="start">Get started</a> <!-- Jump to first playlist item -->
       <br><br>
-      <p class="lead">User ID: {{user_id}}</p>
+      <p class="lead" id="user_id">User ID: </p>
     </div>
     <div class="container" id="footer">
       % include('templates/footer.tpl')
@@ -34,8 +34,20 @@
           $("#jumbotron").hide();
           $("#footer").hide();
       });
-
+    initUserID()
   });
+
+  function initUserID(){
+    const user_id = getCookie("user_id")
+    document.getElementById("user_id").innerText = "User ID: " + user_id
+  }
+
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+
   </script>
 
 </html>

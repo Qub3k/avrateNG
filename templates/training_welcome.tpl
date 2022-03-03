@@ -14,11 +14,15 @@
     <div class="jumbotron" id="jumbotron">
       <h1>Welcome to AVRateNG </h1>
       <p class="lead">This is the training stage</p>
-      <a class="btn btn-large btn-success" href="/rate/0" id="start">Start training</a> <!-- Jump to first trainingsplaylist item -->
+      <div style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <p class="lead" id="user_id" style="margin: 0; padding: 0">User ID: </p>
+        <input type="text" id="user_id_input" oninput="updateUserID()" style="border: 1px solid #222222; border-radius: 5px; padding-left: 10px; padding-right: 10px;"/>
+      </div>
       <br><br>
-      <p class="lead">User ID: {{user_id}}</p>
+      <a class="btn btn-large btn-success" href="/rate/0" id="start">Start training</a> <!-- Jump to first trainingsplaylist item -->
+
     </div>
-    <div class="container" id="footer">
+    <div class="container" id="footer" >
       % include('templates/footer.tpl')
     </div>
 
@@ -33,7 +37,39 @@
           $("#footer").hide();
       });
 
+      initUserID()
+
   });
+
+  function initUserID(){
+    console.log(document.cookie)
+    const user_id = getCookie("user_id")
+    document.getElementById("user_id_input").value = user_id
+  }
+
+  function updateUserID(){
+    const value = document.getElementById("user_id_input").value
+    setCookie("user_id", value)
+    console.log(document.cookie)
+  }
+
+
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
+
+  function setCookie(name,value,days) {
+    let expires = "";
+    if (days) {
+      const date = new Date();
+      date.setTime(date.getTime() + (days*24*60*60*1000));
+      expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+  }
+
   </script>
 
 </html>
