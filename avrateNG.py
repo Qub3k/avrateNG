@@ -230,7 +230,7 @@ def statistics(db, config):
 def get_video_name(playlist, video_index, config):
     video_name = config[playlist][int(video_index)]
     # for supporting multiple files per playlist entry, here needs to be done some extension
-    if len(video_name) == 0:
+    if len(video_name) == 1:
         # old style of storing, one video name per rating
         video_name = video_name[0]
     else:
@@ -280,7 +280,7 @@ def store_rating_key_value_pair(db, config, user_id, timestamp, video_index, key
 
 def save_to_database(db, user_id, video_index, video_name, timestamp, file_path):
     # Create table if it does not exist
-    db.execute('CREATE TABLE IF NOT EXISTS ratings (user_ID INTEGER, video_ID TEXT, video_name TEXT, audio_path TEXT, timestamp TEXT);')
+    #db.execute('CREATE TABLE IF NOT EXISTS ratings (user_ID INTEGER, video_ID TEXT, video_name TEXT, audio_path TEXT, timestamp TEXT);')
 
     db.execute('INSERT INTO ratings VALUES (?,?,?,?,?);', (user_id, video_index, video_name, file_path, timestamp))
     db.commit()
@@ -295,7 +295,8 @@ def save_audio_rating(db, config):
     time_now = datetime.now().strftime("%H-%M-%S")
     user_id = int(request.get_cookie("user_id"))
 
-    timestamp = str(datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S %f'))  # define timestamp for database
+    #timestamp = str(datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S %f'))  # define timestamp for database
+    timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
     filename = "user_"+str(user_id)+"_vid_"+str(video_index)+"___"+str(date_now)+"T"+str(time_now)+"___"+str(uuid.uuid4())+".webm"
     path = "AUDIO_RATINGS/"+filename
@@ -317,6 +318,7 @@ def save_audio_rating(db, config):
     video_name = get_video_name(playlist, video_index, config)
 
     # Save data to database
+
     save_to_database(db, user_id, video_index, video_name, timestamp, path)
 
 
