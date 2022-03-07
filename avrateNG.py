@@ -98,6 +98,10 @@ def welcome(db, config):
     welcome screen
     """
 
+    training_enabled = config["training"]
+    print(training_enabled)
+    response.set_cookie("training_enabled", str(training_enabled).lower(), path="/")
+
     # Getting user_id and incrementing it later only in the beginning of training session
     #user_id = int(db.execute('SELECT max(user_ID) from ratings').fetchone()[0])
     '''
@@ -123,13 +127,15 @@ def welcome(db, config):
             # If training_state is not set to done it is then set to open and training session is enabled #IMPORTANT (see /save_audio_rating endpoint)
             response.set_cookie("training_state", "open", path="/")
             response.set_cookie("training", "1", path="/")
-            response.set_cookie("user_id", str(random.randint(100000000, 999999999)), path="/")  # Updating user_id cookie only in beginning of training session
+            response.set_cookie("user_id", str(random.randint(100000000, 999999999)), path="/")  # Updating user_id cookie
             return template(config["template_folder"] + "/training_welcome.tpl", title="AvRateNG")
         else:
             response.set_cookie("training", "0", path="/")
             return template(config["template_folder"] + "/welcome.tpl", title="AvRateNG")
     else:
         response.set_cookie("training", "0", path="/")
+        if not training_enabled:
+            response.set_cookie("user_id", str(random.randint(100000000, 999999999)), path="/")  # Updating user_id cookie
         return template(config["template_folder"] + "/welcome.tpl", title="AvRateNG")
 
 
