@@ -154,7 +154,3 @@ If you use this software in your research, please include a link to the reposito
 
 GNU General Public License v3. See LICENSE file in this repository.
 
-# Acknowledgments
-
-The software development leading to this repository has received funding from the Norwegian Financial Mechanism 2014-2021 under project 2019/34/H/ST6/00599.
-
